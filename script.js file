@@ -1,0 +1,116 @@
+const songs = [
+{
+    title: "Haareya",
+    artist: "Arjit singh",
+    src: "songs/song1.mp3"
+},
+{
+    title: "Humsafar",
+    artist: "Sachet and parampara tandon",
+    src: "songs/song2.mp3"
+},
+{
+    title: "Khat",
+    artist: "Navjot ahuja",
+    src: "songs/song3.mp3"
+}
+];
+
+const audio = document.getElementById("audio");
+const title = document.getElementById("title");
+const artist = document.getElementById("artist");
+const progress = document.getElementById("progress");
+const duration = document.getElementById("duration");
+const volume = document.getElementById("volume");
+const playlist = document.getElementById("playlist");
+
+let currentSong = 0;
+
+function loadSong(index){
+    audio.src = songs[index].src;
+    title.textContent = songs[index].title;
+    artist.textContent = songs[index].artist;
+}
+
+loadSong(currentSong);
+
+document.getElementById("play").addEventListener("click", () => {
+    audio.play();
+});
+
+document.getElementById("pause").addEventListener("click", () => {
+    audio.pause();
+});
+
+document.getElementById("next").addEventListener("click", () => {
+    currentSong++;
+    if(currentSong >= songs.length){
+        currentSong = 0;
+    }
+    loadSong(currentSong);
+    audio.play();
+});
+
+document.getElementById("prev").addEventListener("click", () => {
+    currentSong--;
+    if(currentSong < 0){
+        currentSong = songs.length - 1;
+    }
+    loadSong(currentSong);
+    audio.play();
+});
+
+audio.addEventListener("timeupdate", () => {
+
+    progress.max = audio.duration;
+
+    progress.value = audio.currentTime;
+
+    let currentMin = Math.floor(audio.currentTime / 60);
+    let currentSec = Math.floor(audio.currentTime % 60);
+
+    let totalMin = Math.floor(audio.duration / 60) || 0;
+    let totalSec = Math.floor(audio.duration % 60) || 0;
+
+    duration.textContent =
+        `${currentMin}:${String(currentSec).padStart(2,'0')} / 
+         ${totalMin}:${String(totalSec).padStart(2,'0')}`;
+});
+
+progress.addEventListener("input", () => {
+    audio.currentTime = progress.value;
+});
+
+volume.addEventListener("input", () => {
+    audio.volume = volume.value;
+});
+
+/* Playlist */
+
+songs.forEach((song,index)=>{
+    const li = document.createElement("li");
+
+    li.textContent = `${song.title} - ${song.artist}`;
+
+    li.addEventListener("click",()=>{
+        currentSong = index;
+        loadSong(currentSong);
+        audio.play();
+    });
+
+    playlist.appendChild(li);
+});
+
+/* AutoPlay */
+
+audio.addEventListener("ended",()=>{
+    currentSong++;
+
+    if(currentSong >= songs.length){
+        currentSong = 0;
+    }
+
+    loadSong(currentSong);
+
+    audio.play();
+});
